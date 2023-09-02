@@ -1,0 +1,23 @@
+# ========================== VARIABLES ==========================
+x-client-args: &client-args
+  DOCKER_NODE_VERSION: 18.17.0-slim
+  DOCKER_UBUNTU_VERSION: jammy-20230624
+
+services:
+# ========================== PRODUCTION ==========================
+  client-prod:
+    build:
+      dockerfile: ./apps/client/Dockerfile
+      target: production
+      args: *client-args
+
+
+# ========================== DEVELOPMENT ==========================
+  client-dev:
+    build:
+      dockerfile: ./apps/client/Dockerfile
+      target: development
+      args: *client-args
+    restart: unless-stopped
+    volumes:
+      - ./apps/client:/app/client
