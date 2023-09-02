@@ -1,0 +1,15 @@
+{
+  "name": "@node-typescript-monorepo-template/math",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Ben Chiang <chiangbenjamin991@gmail.com>",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build:ts": "tsc"
+  }
+}

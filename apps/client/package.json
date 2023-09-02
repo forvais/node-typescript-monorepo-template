@@ -1,0 +1,14 @@
+{
+  "name": "@node-typescript-monorepo-template/client",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Ben Chiang <chiangbenjamin991@gmail.com>",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  },
+  "scripts": {
+    "build:ts": "tsc"
+  }
+}
