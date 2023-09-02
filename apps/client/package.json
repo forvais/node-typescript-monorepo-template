@@ -6,9 +6,17 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "scripts": {
+    "start": "npm run dist/index.js",
+    "start:dev": "nodemon --exitcrash -x 'node -r ts-node/register' src/ --watch src/ --ext ts,json",
     "build:ts": "tsc"
+  },
+  "dependencies": {
+    "@node-typescript-monorepo-template/logger": "^0.0.0",
+    "@node-typescript-monorepo-template/math": "^0.0.0"
   }
 }
