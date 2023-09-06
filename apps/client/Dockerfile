@@ -25,7 +25,6 @@ WORKDIR ${WORKSPACE}
 COPY --chown=${USER}:${USER} ./packages/ ./packages
 COPY --chown=${USER}:${USER} ./package*.json ./
 RUN npm install -ws \
-    && rm $(find . -name "*.tsbuildinfo") \
     && npm run build:ts -ws
 
 
