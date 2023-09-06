@@ -3,6 +3,12 @@ x-client-args: &client-args
   DOCKER_NODE_VERSION: 18.17.0-slim
   DOCKER_UBUNTU_VERSION: jammy-20230624
 
+x-math-args: &math-args
+  DOCKER_NODE_VERSION: 18.17.0-slim
+
+x-logger-args: &logger-args
+  DOCKER_NODE_VERSION: 18.17.0-slim
+
 services:
 # ========================== PRODUCTION ==========================
   client-prod:
@@ -21,3 +27,29 @@ services:
     restart: unless-stopped
     volumes:
       - ./apps/client:/app/client
+      - packages-math-ephemeral:/app/packages/math/dist:ro
+      - packages-logger-ephemeral:/app/packages/logger/dist:ro
+
+  math-dev:
+    build:
+      dockerfile: ./packages/math/Dockerfile
+      target: builder
+      args: *math-args
+    restart: unless-stopped
+    volumes:
+      - ./packages/math/:/app/lib:rw
+      - packages-math-ephemeral:/app/lib/dist:rw
+
+  logger-dev:
+    build:
+      dockerfile: ./packages/logger/Dockerfile
+      target: builder
+      args: *logger-args
+    restart: unless-stopped
+    volumes:
+      - ./packages/logger/:/app/lib:rw
+      - packages-logger-ephemeral:/app/lib/dist:rw
+
+volumes:
+  packages-math-ephemeral:
+  packages-logger-ephemeral:

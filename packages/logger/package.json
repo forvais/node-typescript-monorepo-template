@@ -10,6 +10,7 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
+    "build:ts:watch": "npm run build:ts -- --watch",
     "build:ts": "tsc"
   }
 }
