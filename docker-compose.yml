@@ -26,7 +26,7 @@ services:
       args: *client-args
     restart: unless-stopped
     volumes:
-      - ./apps/client:/app/client
+      - ./apps/client:/app/client:ro
       - packages-math-ephemeral:/app/packages/math/dist:ro
       - packages-logger-ephemeral:/app/packages/logger/dist:ro
 
@@ -37,7 +37,7 @@ services:
       args: *math-args
     restart: unless-stopped
     volumes:
-      - ./packages/math/:/app/lib:rw
+      - ./packages/math/:/app/lib:ro
       - packages-math-ephemeral:/app/lib/dist:rw
 
   logger-dev:
@@ -47,7 +47,7 @@ services:
       args: *logger-args
     restart: unless-stopped
     volumes:
-      - ./packages/logger/:/app/lib:rw
+      - ./packages/logger/:/app/lib:ro
       - packages-logger-ephemeral:/app/lib/dist:rw
 
 volumes:
