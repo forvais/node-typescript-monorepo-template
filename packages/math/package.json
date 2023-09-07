@@ -9,11 +9,12 @@
   "devDependencies": {
     "@tsconfig/node18": "^18.2.1",
     "@types/node": "^18.17.14",
+    "tsc-alias": "^1.8.7",
     "typescript": "^5.2.2"
   },
   "scripts": {
     "build:watch": "npm run build -- --watch",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "lint": "eslint --ext ts src && tsc --noEmit --project tsconfig.json"
   }
 }

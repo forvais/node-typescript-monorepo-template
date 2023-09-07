@@ -10,10 +10,11 @@
     "@types/node": "^18.17.14",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.7",
     "typescript": "^5.2.2"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "npm run dist/index.js",
     "start:dev": "nodemon --exitcrash -x 'node -r ts-node/register' src/ --watch src/ --ext ts,json",
     "lint": "eslint --ext ts src/ && tsc --noEmit -p tsconfig.json"
