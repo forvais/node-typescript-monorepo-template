@@ -11,9 +11,10 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
+    "build:ts": "tsc",
     "start": "npm run dist/index.js",
     "start:dev": "nodemon --exitcrash -x 'node -r ts-node/register' src/ --watch src/ --ext ts,json",
-    "build:ts": "tsc"
+    "lint": "eslint --ext ts src/ && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@node-typescript-monorepo-template/logger": "^0.0.0",

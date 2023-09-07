@@ -14,5 +14,13 @@
   },
   "scripts": {
     "build:ts": "npm run build:ts -w packages && npm run build:ts -w apps"
+    "lint": "npm run lint -w packages && npm run lint -w apps"
+  },
+  "devDependencies": {
+    "@forvais/eslint-config-base": "^1.0.0",
+    "@forvais/eslint-config-node": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.6.0",
+    "@typescript-eslint/parser": "^6.6.0",
+    "eslint": "^8.48.0"
   }
 }

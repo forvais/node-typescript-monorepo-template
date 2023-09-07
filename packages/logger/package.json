@@ -11,6 +11,7 @@
   },
   "scripts": {
     "build:ts:watch": "npm run build:ts -- --watch",
-    "build:ts": "tsc"
+    "build:ts": "tsc",
+    "lint": "eslint --ext ts src && tsc --noEmit --project tsconfig.json"
   }
 }
