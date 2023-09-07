@@ -11,7 +11,7 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
-    "build:ts": "tsc",
+    "build": "tsc",
     "start": "npm run dist/index.js",
     "start:dev": "nodemon --exitcrash -x 'node -r ts-node/register' src/ --watch src/ --ext ts,json",
     "lint": "eslint --ext ts src/ && tsc --noEmit -p tsconfig.json"

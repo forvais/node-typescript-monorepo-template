@@ -25,7 +25,7 @@ WORKDIR ${WORKSPACE}
 COPY --chown=${USER}:${USER} ./packages/ ./packages
 COPY --chown=${USER}:${USER} ./package*.json ./
 RUN npm install -ws \
-    && npm run build:ts -ws
+    && npm run build -ws
 
 
 # ========================== BASE STAGE ==========================

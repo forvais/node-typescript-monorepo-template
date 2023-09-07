@@ -14,6 +14,6 @@ RUN npm install
 
 WORKDIR ${WORKSPACE}/lib
 COPY ./packages/logger ./
-RUN npm run build:ts
+RUN npm run build
 
-CMD ["npm", "run", "build:ts:watch"]
+CMD ["npm", "run", "build:watch"]

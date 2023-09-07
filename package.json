@@ -13,7 +13,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build:ts": "npm run build:ts -w packages --if-present && npm run build:ts -w apps --if-present",
+    "build": "npm run build -w packages --if-present && npm run build -w apps --if-present",
     "lint": "npm run lint -w packages --if-present && npm run lint -w apps --if-present"
   },
   "devDependencies": {

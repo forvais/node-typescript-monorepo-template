@@ -10,8 +10,8 @@
     "typescript": "^5.2.2"
   },
   "scripts": {
-    "build:ts:watch": "npm run build:ts -- --watch",
-    "build:ts": "tsc",
+    "build:watch": "npm run build -- --watch",
+    "build": "tsc",
     "lint": "eslint --ext ts src && tsc --noEmit --project tsconfig.json"
   }
 }
