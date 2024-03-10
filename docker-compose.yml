@@ -1,13 +1,13 @@
 # ========================== VARIABLES ==========================
 x-client-args: &client-args
-  DOCKER_NODE_VERSION: 18.17.0-slim
+  DOCKER_NODE_VERSION: 20.11.1-slim
   DOCKER_UBUNTU_VERSION: jammy-20230624
 
 x-math-args: &math-args
-  DOCKER_NODE_VERSION: 18.17.0-slim
+  DOCKER_NODE_VERSION: 20.11.1-slim
 
 x-logger-args: &logger-args
-  DOCKER_NODE_VERSION: 18.17.0-slim
+  DOCKER_NODE_VERSION: 20.11.1-slim
 
 services:
 # ========================== PRODUCTION ==========================
