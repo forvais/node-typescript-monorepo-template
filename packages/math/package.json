@@ -8,9 +8,9 @@
   "types": "dist/index.d.ts",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
-    "@types/node": "^18.17.14",
-    "tsc-alias": "^1.8.7",
-    "typescript": "^5.2.2"
+    "@types/node": "^20.11.25",
+    "tsc-alias": "^1.8.8",
+    "typescript": "^5.4.2"
   },
   "scripts": {
     "build:watch": "tsc --watch & tsc-alias --watch",
