@@ -32,6 +32,9 @@ services:
       - ./apps/client:/app/client:ro
       - packages-math-ephemeral:/app/packages/math/dist:ro
       - packages-logger-ephemeral:/app/packages/logger/dist:ro
+    depends_on:
+      - math-dev
+      - logger-dev
 
   math-dev:
     build:
