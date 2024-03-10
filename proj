@@ -29,7 +29,7 @@ logs() {
 }
 
 down() {
-  $COMPOSE down --remove-orphans $($SERVICES | grep -vE "dev-container")
+  $COMPOSE down --remove-orphans $($SERVICES | grep -vE "dev-container") -t 0
   docker volume rm $(docker volume ls -q | grep -E "$PROJECT.*\-ephemeral$")
 }
 
