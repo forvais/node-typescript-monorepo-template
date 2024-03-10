@@ -6,7 +6,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "@tsconfig/node18": "^18.2.1",
+    "@tsconfig/node20": "^20.1.2",
     "@types/node": "^18.17.14",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
