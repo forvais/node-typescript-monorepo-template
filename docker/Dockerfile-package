@@ -1,19 +1,23 @@
+# syntax=docker/dockerfile:1
+ARG PROJECT
+
 ARG USER=node
 ARG WORKSPACE=/app
 
-ARG DOCKER_NODE_VERSION=18.17.0-slim
+ARG DOCKER_NODE_VERSION=latest
 
 # ========================== BUILDER STAGE ==========================
 FROM node:${DOCKER_NODE_VERSION} AS builder
+ARG PROJECT
 ARG WORKSPACE
 
 WORKDIR ${WORKSPACE}
-COPY ./packages/logger/package.json ./
-COPY ./package-lock.json ./
+COPY --chown=${USER}:${USER} ./packages/${PROJECT}/package.json ./
+COPY --chown=${USER}:${USER} ./package-lock.json ./
 RUN npm install
 
 WORKDIR ${WORKSPACE}/lib
-COPY ./packages/logger ./
+COPY --chown=${USER}:${USER} ./packages/${PROJECT} ./
 RUN npm run build
 
 CMD ["npm", "run", "build:watch"]

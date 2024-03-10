@@ -1,19 +1,22 @@
 # ========================== VARIABLES ==========================
 x-client-args: &client-args
+  PROJECT: client
   DOCKER_NODE_VERSION: 20.11.1-slim
   DOCKER_UBUNTU_VERSION: jammy-20230624
 
 x-math-args: &math-args
+  PROJECT: math
   DOCKER_NODE_VERSION: 20.11.1-slim
 
 x-logger-args: &logger-args
+  PROJECT: logger
   DOCKER_NODE_VERSION: 20.11.1-slim
 
 services:
 # ========================== PRODUCTION ==========================
   client-prod:
     build:
-      dockerfile: ./apps/client/Dockerfile
+      dockerfile: ./docker/Dockerfile-api
       target: production
       args: *client-args
 
@@ -21,7 +24,7 @@ services:
 # ========================== DEVELOPMENT ==========================
   client-dev:
     build:
-      dockerfile: ./apps/client/Dockerfile
+      dockerfile: ./docker/Dockerfile-api
       target: development
       args: *client-args
     restart: unless-stopped
@@ -32,7 +35,7 @@ services:
 
   math-dev:
     build:
-      dockerfile: ./packages/math/Dockerfile
+      dockerfile: ./docker/Dockerfile-package
       target: builder
       args: *math-args
     restart: unless-stopped
@@ -42,7 +45,7 @@ services:
 
   logger-dev:
     build:
-      dockerfile: ./packages/logger/Dockerfile
+      dockerfile: ./docker/Dockerfile-package
       target: builder
       args: *logger-args
     restart: unless-stopped
