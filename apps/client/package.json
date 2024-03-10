@@ -1,22 +1,21 @@
 {
   "name": "@node-typescript-monorepo-template/client",
+  "type": "module",
   "private": true,
   "version": "0.0.0",
   "author": "Ben Chiang <chiangbenjamin991@gmail.com>",
-  "main": "index.js",
   "license": "MIT",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.11.25",
-    "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.8",
-    "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.7.1",
     "typescript": "^5.4.2"
   },
   "scripts": {
     "build": "tsc && tsc-alias",
     "start": "npm run dist/index.js",
-    "start:dev": "node --watch -r ts-node/register -r tsconfig-paths/register src/",
+    "start:dev": "node --watch --import tsx/esm src/",
     "lint": "eslint --ext ts src/ && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
