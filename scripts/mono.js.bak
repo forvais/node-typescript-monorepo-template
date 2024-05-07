@@ -1,0 +1,338 @@
+// @ts-check
+const util = require('node:util');
+const process = require('node:process');
+const { execSync } = require('node:child_process');
+
+const package = require('../package.json');
+
+/**
+ * Represents a table entry in the Commands table member.
+ * @typedef {Object} Command
+ * @property {(command: string, args: string[]) => any} handler - The function to handle the command.
+ * @property {string} command - The name of the command.
+ * @property {string} usage - The usage syntax description of the command.
+ * @property {string} description - The description of the command.
+ */
+
+const DEBUG = !!process.env.DEBUG;
+
+class StringFormatter {
+  static FOREGROUND = {
+    RED: 31,
+    GREEN: 32,
+    YELLOW: 33,
+    DEFAULT: 39,
+    CYAN: 36,
+  };
+
+  /**
+   * Converts messages to nicely formatted strings.
+   * @param {...*} messages - The message(s) to format.
+   * @returns {string[]} The formatted messages.
+   */
+  static formatMessages(...messages) {
+    return messages.map(msg => (typeof msg === 'object' ? util.inspect(msg) : msg));
+  }
+
+  /**
+   * Applies color to a message.
+   * @param {number} color - The color code to apply.
+   * @param {...string} messages - The message(s) to which the color is applied.
+   * @returns {string} The colored message.
+   */
+  static applyColor(color, ...messages) {
+    return `\x1b[${color}m${messages.join(' ')}\x1b[0m`;
+  }
+}
+
+const logger = {
+  /**
+   * Logs informational messages.
+   * @param {...*} messages - The message(s) to log.
+   */
+  info(...messages) {
+    console.info(...StringFormatter.formatMessages(...messages));
+  },
+
+  /**
+   * Logs a debug message.
+   * @param {...*} messages - The message(s) to log.
+   */
+  debug(...messages) {
+    if (!DEBUG) return;
+    console.debug(StringFormatter.applyColor(StringFormatter.FOREGROUND.CYAN, ...StringFormatter.formatMessages(...messages)));
+  },
+
+  /**
+   * Logs an error message.
+   * @param {...*} messages - The message(s) to log.
+   */
+  error(...messages) {
+    console.error(StringFormatter.applyColor(StringFormatter.FOREGROUND.RED, ...StringFormatter.formatMessages(...messages)));
+  },
+
+  /**
+   * Logs a warning message.
+   * @param {...*} messages - The message(s) to log.
+   */
+  warn(...messages) {
+    console.warn(StringFormatter.applyColor(StringFormatter.FOREGROUND.YELLOW, ...StringFormatter.formatMessages(...messages)));
+  },
+};
+
+/**
+ * @param {string} semvar - A string delimited delimited by periods (.)
+ */
+function parseSemvar(semvar) {
+  let [major, minor, patch] = semvar.split('.');
+
+  if (major === 'x') major = '-1';
+  if (minor === 'x') minor = '-1';
+  if (patch === 'x') patch = '-1';
+
+  return {
+    major: parseInt(major, 10),
+    minor: parseInt(minor, 10),
+    patch: parseInt(patch, 10),
+  };
+}
+
+/**
+ * @param {string} semvar - A string delimited delimited by periods (.)
+ */
+function cleanPackageSemvar(semvar) {
+  return semvar
+    .replace('~', '')
+    .replace('^', '')
+    .replace('>=', '')
+    .replace('>', '')
+    .replace('<=', '')
+    .replace('<', '')
+    .replace(/X/g, 'x');
+}
+
+/**
+ * @param {string} requirement - The required semvar version
+ * @param {string} actual - The actual semvar version
+ */
+function doesVersionSatisfy(requirement, actual) {
+  if (requirement.trim().toLowerCase() === 'latest' || requirement.trim() === '*') {
+    return true; // NOTE: It's not really possible to check for latest within the scope of this script.
+  }
+
+  const reqSemvar = parseSemvar(cleanPackageSemvar(requirement));
+  const actSemvar = parseSemvar(cleanPackageSemvar(actual));
+
+  if (actSemvar.major < reqSemvar.major) return false;
+  if (actSemvar.minor < reqSemvar.minor) return false;
+  if (actSemvar.patch < reqSemvar.patch) return false;
+
+  return true;
+}
+
+/**
+ * Executes a command using a lookup table of functions.
+ *
+ * @param {Commands} commands - An instace of Commands populated with commands.
+ * @param {string | undefined} command - The command to be executed.
+ * @param {string[]} args - An array of arguments for the command.
+ */
+function execCommand(commands, command, args) {
+  // NOTE: This check assumes you're using Node as your runtime
+  const recommendedNodeVersion = package.engines?.node;
+  const actualNodeVersion = execSync('node --version').toString().trim().slice(1);
+  if (!doesVersionSatisfy(recommendedNodeVersion, actualNodeVersion)) {
+    logger.warn(`This project recommends using Node ${recommendedNodeVersion} but you're using Node ${actualNodeVersion}.`);
+  }
+
+  // const handler = lookup[(command || '__invalid__').toLowerCase()] || lookup['__invalid__'];
+  try {
+    commands.execute(command, args);
+  } catch (e) {
+    logger.debug('=== Handler exception thrown ===');
+    if (e) logger.error(e);
+  }
+}
+
+/**
+ * @param {string} cmd - Command to execute.
+ */
+function fork(cmd, opts = { stdout: true }) {
+  logger.debug(cmd);
+
+  const stdio = opts.stdout ? 'inherit' : 'pipe';
+  return execSync(cmd, { stdio });
+}
+
+class Compose {
+  /**
+   * @param {string} project - The project name for Docker Compose.
+   * @param {string} composeFile - The path to the Docker Compose file.
+   */
+  constructor(project, composeFile) {
+    /**
+     * The Docker Compose command constructed with the provided project name and compose file.
+     * @type {string}
+     */
+    this.command = `docker compose -p ${project} -f ${composeFile}`;
+
+    /**
+     * A cache for services so we don't have to fork commands more than needed.
+     * @type {string[]}
+     */
+    this.servicesListCache = [];
+  }
+
+  /**
+   * @returns {string[]} An array containing the names of services.
+   */
+  getServices() {
+    if (this.servicesListCache.length === 0) {
+      this.servicesListCache = fork(`${this.command} config --services`, { stdout: false })
+        .toString()
+        .split('\n')
+        .filter(service => !!service);
+    }
+
+    return this.servicesListCache;
+  }
+
+  /**
+   * @param {string} stack - The stack name to filter services.
+   */
+  getServicesByStack(stack) {
+    const services = [];
+
+    for (const service of this.getServices()) {
+      if (service.endsWith(stack)) services.push(service);
+    }
+
+    return services;
+  }
+
+  /**
+   * @param {string} target - The service or stack of services to get.
+   */
+  resolveTargetServices(target) {
+    const explicitService = this.getServices().filter(service => service === target);
+
+    if (explicitService.length) return explicitService[0];
+
+    return this.getServicesByStack(target).join(' ');
+  }
+
+  /**
+   * @param {...string} services - The names of services to start.
+   */
+  start(...services) {
+    fork(`${this.command} up -d ${services.map(this.resolveTargetServices.bind(this)).join(' ')}`);
+  }
+
+  /**
+   * @param {...string} services - The names of services to build.
+   */
+  build(...services) {
+    fork(`${this.command} build ${services.map(this.resolveTargetServices.bind(this)).join(' ')}`);
+  }
+
+  /**
+   * @param {...string} services - The names of services to stop and remove.
+   */
+  down(...services) {
+    fork(`${this.command} down ${services.map(this.resolveTargetServices.bind(this)).join(' ')} -t 0`);
+  }
+
+  /**
+   * @param {...string} services - The names of services to display logs for.
+   */
+  logs(...services) {
+    fork(`${this.command} logs ${services.map(this.resolveTargetServices.bind(this)).join(' ')}`);
+  }
+}
+
+/**
+ * Represents a collection of commands.
+ */
+class Commands {
+  /**
+   * Creates an instance of Commands.
+   */
+  constructor() {
+    /** @type {Object.<string, Command>} */
+    this.table = {};
+  }
+
+  /**
+   * Adds a new command to the Commands table.
+   * @param {string} command - The name of the command.
+   * @param {string} usage - The usage syntax description of the command.
+   * @param {string} description - The description of the command.
+   * @param {(command: string, args: string[]) => any} handler - The function to handle the command.
+   */
+  add(command, usage, description, handler) {
+    this.table[command] = { command, usage, description, handler };
+  }
+
+  /**
+   * Executes the specified command.
+   * @param {string | undefined} command - The name of the command to execute.
+   * @param {string[]} args - Arguments to pass to the command handler.
+   */
+  execute(command, args) {
+    if (!command) return logger.error('Please provide a command, see \'help\' for a list of commands.');
+
+    const commandEntry = this.table[command];
+
+    if (!commandEntry) return logger.error(`Command '${command}' not found, see 'help' for a list of commands.`);
+
+    return commandEntry.handler(command, args);
+  }
+
+  displayHelpMenu() {
+    const applyGreen = StringFormatter.applyColor.bind(StringFormatter, StringFormatter.FOREGROUND.GREEN);
+    const commandKeys = Object.keys(this.table).map(key => applyGreen(key));
+    const commandDescriptors = Object.values(this.table);
+
+    let maxKeyLength = -1;
+
+    for (let i = 0; i < commandKeys.length; i++) {
+      const key = commandKeys[i];
+      const descriptor = commandDescriptors[i];
+
+      maxKeyLength = Math.max(maxKeyLength, key.length + descriptor.usage.length);
+    }
+
+    for (let i = 0; i < commandKeys.length; i++) {
+      const key = commandKeys[i];
+      const { usage, description } = commandDescriptors[i];
+
+      logger.info(`${(`${key} ${usage}`).padEnd(maxKeyLength + 1)} | ${description}`);
+    }
+  }
+}
+
+const PROJECT = package.name.split('/').pop() || 'project';
+const COMPOSE_FILE = 'docker-compose.yml';
+
+const compose = new Compose(PROJECT, COMPOSE_FILE);
+
+const _command = process.argv[2];
+const _args = process.argv.slice(3);
+
+// ============== COMMAND DEFINITIONS ==============
+const commands = new Commands();
+
+commands.add('docker', '[OPTIONS] COMMAND', 'Docker compose wrapper, add `--help` for commands.', (_, args) => fork(`${compose.command} ${args.join(' ')}`));
+commands.add('down', '[SERVICE] ...[SERVICE]', 'Shuts down and removes one or more services, searching first by service name and then by stack name', (_, args) => compose.down(...args));
+commands.add('logs', '[SERVICE] ...[SERVICE]', 'Displays logs for one or more services, searching first by service name and then by stack name', (_, args) => compose.logs(...args));
+commands.add('build', '[SERVICE] ...[SERVICE]', 'Builds the docker images for one or more services, searching first by service name and then by stack name.', (_, args) => compose.build(...args));
+commands.add('start', '[SERVICE] ...[SERVICE]', 'Starts one or more services, searching first by service name and then by stack name.', (_, args) => compose.start(...args));
+commands.add('start:dev', '', 'Start the entire dev stack (alias dev).', (_, __) => compose.start(...compose.getServicesByStack('dev')));
+commands.add('start:prod', '', 'Start the entire prod stack (alias prod).', (_, __) => compose.start(...compose.getServicesByStack('prod')));
+commands.add('dev', '', 'Start the entire dev stack (alias start:dev).', (_, __) => compose.start(...compose.getServicesByStack('dev')));
+commands.add('prod', '', 'Start the entire prod stack (alias start:prod).', (_, __) => compose.start(...compose.getServicesByStack('prod')));
+commands.add('install', '', 'Install npm and local dependencies.', (_, __) => fork('npm install && npm install -ws && npm run build -w packages'));
+commands.add('help', '', 'Displays this help menu.', (_, __) => commands.displayHelpMenu());
+// =================================================
+
+execCommand(commands, _command, _args);
