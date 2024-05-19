@@ -6,7 +6,6 @@
   "license": "MIT",
   "workspaces": [
     "apps/client",
-    "packages/math",
     "packages/logger"
   ],
   "engines": {

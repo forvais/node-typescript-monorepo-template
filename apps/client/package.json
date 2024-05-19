@@ -19,7 +19,6 @@
     "lint": "eslint --ext ts src/ && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@node-typescript-monorepo-template/logger": "^0.0.0",
-    "@node-typescript-monorepo-template/math": "^0.0.0"
+    "@node-typescript-monorepo-template/logger": "^0.0.0"
   }
 }
