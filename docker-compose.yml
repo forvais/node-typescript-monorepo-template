@@ -1,7 +1,7 @@
 # ========================== VARIABLES ==========================
-x-client-args: &client-args
+x-api-args: &api-args
   SCOPE: "@node-typescript-monorepo-template"
-  PROJECT: client
+  PROJECT: api
   DOCKER_NODE_VERSION: 20.11.1-slim
   DOCKER_UBUNTU_VERSION: jammy-20230624
 
@@ -12,22 +12,22 @@ x-logger-args: &logger-args
 
 services:
 # ========================== PRODUCTION ==========================
-  client-prod:
+  api-prod:
     build:
       dockerfile: ./docker/Dockerfile-api
       target: production
-      args: *client-args
+      args: *api-args
 
 
 # ========================== DEVELOPMENT ==========================
-  client-dev:
+  api-dev:
     build:
       dockerfile: ./docker/Dockerfile-api
       target: development
-      args: *client-args
+      args: *api-args
     restart: unless-stopped
     volumes:
-      - ./apps/client:/workspace/apps/client:ro
+      - ./apps/api:/workspace/apps/api:ro
       - packages-logger-ephemeral:/workspace/packages/logger/dist:ro
     depends_on:
       - logger-dev

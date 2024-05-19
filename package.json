@@ -5,7 +5,7 @@
   "author": "Ben Chiang <chiangbenjamin991@gmail.com>",
   "license": "MIT",
   "workspaces": [
-    "apps/client",
+    "apps/api",
     "packages/logger"
   ],
   "engines": {
