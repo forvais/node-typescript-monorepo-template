@@ -119,6 +119,7 @@ COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /lib64/ld-linux-x86-64.so.2 /lib64/
 
 # Copy build artifacts
+COPY --from=base --chown=${USER}:${USER} ${WORKSPACE}/apps/${PROJECT} ${WORKSPACE}/apps/${PROJECT}
 COPY --from=build --chown=${USER}:${USER} ${WORKSPACE}/apps/${PROJECT}/dist ${WORKSPACE}/apps/${PROJECT}/dist
 
 # Copy production dependencies
