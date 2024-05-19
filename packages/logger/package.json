@@ -16,5 +16,8 @@
     "build:watch": "tsc --watch & tsc-alias --watch",
     "build": "tsc && tsc-alias",
     "lint": "eslint --ext ts src && tsc --noEmit --project tsconfig.json"
+  },
+  "dependencies": {
+    "winston": "^3.13.0"
   }
 }
