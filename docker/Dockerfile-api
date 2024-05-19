@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1
+ARG SCOPE
 ARG PROJECT
 
 ARG USER=node
@@ -19,15 +20,39 @@ RUN mkdir -p /node-deps/lib/x86_64-linux-gnu \
       | xargs -I '{}' cp -v '{}' /node-deps'{}'
 
 
-# ========================== PACKAGES STAGE ==========================
-FROM node:${DOCKER_NODE_VERSION} AS packages
+# ========================== TURBO STAGE ==========================
+FROM node:${DOCKER_NODE_VERSION} AS turbo
+ARG SCOPE
+ARG PROJECT
 ARG WORKSPACE
 WORKDIR ${WORKSPACE}
 
-COPY --chown=${USER}:${USER} ./packages/ ./packages
+COPY --chown=${USER}:${USER} ./apps ./apps
+COPY --chown=${USER}:${USER} ./packages ./packages
 COPY --chown=${USER}:${USER} ./package*.json ./
-RUN npm install -ws \
-    && npm run build -ws
+COPY --chown=${USER}:${USER} ./turbo.json ./turbo.json
+RUN npm install \
+    && npx --no-install turbo prune ${SCOPE}/${PROJECT} --docker \
+    && mv ./out/package-lock.json ./out/full/package-lock.json
+
+
+# ========================== DEV MODULES STAGE ==========================
+FROM node:${DOCKER_NODE_VERSION} AS dev-modules
+ARG WORKSPACE
+
+WORKDIR ${WORKSPACE}
+COPY --from=turbo --chown=${USER}:${USER} ${WORKSPACE}/out/json ./
+
+RUN npm install
+
+# ========================== PROD MODULES STAGE ==========================
+FROM node:${DOCKER_NODE_VERSION} AS prod-modules
+ARG WORKSPACE
+
+WORKDIR ${WORKSPACE}
+COPY --from=turbo --chown=${USER}:${USER} ${WORKSPACE}/out/json ./
+
+RUN npm install --omit=dev
 
 
 # ========================== BASE STAGE ==========================
@@ -55,24 +80,17 @@ RUN groupadd --gid 1000 ${USER} \
 USER ${USER}
 WORKDIR ${WORKSPACE}
 
-# Install production dependencies
-COPY --from=packages --chown=${USER}:${USER} ${WORKSPACE}/packages/ ./packages
-COPY --chown=${USER}:${USER} ./apps/${PROJECT}/package.json ./
-COPY --chown=${USER}:${USER} ./package-lock.json ./
-RUN npm install --omit=dev
+COPY --chown=${USER}:${USER} ./ ./
+COPY --from=turbo --chown=${USER}:${USER} ${WORKSPACE}/out/full ./
+COPY --from=dev-modules --chown=${USER}:${USER} ${WORKSPACE}/node_modules ./node_modules
+RUN npx --no-install turbo run build --filter="./packages/*"
 
 
 # ========================== DEVELOPMENT STAGE ==========================
 FROM base AS development
-ARG PROJECT
 ENV NODE_ENV=development
 
-# Install all dependencies
-RUN npm install && npm cache clean --force
-
-# Copy source code for cases where the image is run outside of a docker-compose environment
-WORKDIR ${WORKSPACE}/${PROJECT}
-COPY --chown=${USER}:${USER} ./apps/${PROJECT} .
+WORKDIR ${WORKSPACE}/apps/${PROJECT}
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["npm", "run", "start:dev"]
@@ -80,14 +98,8 @@ CMD ["npm", "run", "start:dev"]
 
 # ========================== BUILD STAGE ==========================
 FROM base AS build
-ARG PROJECT
 
-WORKDIR ${WORKSPACE}/${PROJECT}
-COPY --chown=${USER}:${USER} ./apps/${PROJECT} .
-COPY --from=development --chown=${USER}:${USER} ${WORKSPACE}/node_modules/ ${WORKSPACE}/node_modules/
-RUN rm -rf build/ \
-    && npm run build \
-    && rm -rf ${WORKSPACE}/node_modules/
+RUN npx --no-install turbo run build --filter='./apps/*'
 
 
 # ========================== PRODUCTION STAGE ==========================
@@ -107,14 +119,14 @@ COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /lib64/ld-linux-x86-64.so.2 /lib64/
 
 # Copy build artifacts
-COPY --from=build --chown=${USER}:${USER} ${WORKSPACE}/${PROJECT}/dist ${WORKSPACE}/${PROJECT}/dist
+COPY --from=build --chown=${USER}:${USER} ${WORKSPACE}/apps/${PROJECT}/dist ${WORKSPACE}/apps/${PROJECT}/dist
 
 # Copy production dependencies
-COPY --from=base --chown=${USER}:${USER} ${WORKSPACE}/node_modules ${WORKSPACE}/node_modules
+COPY --from=prod-modules --chown=${USER}:${USER} ${WORKSPACE}/node_modules ${WORKSPACE}/node_modules
 
 # Copy production dependencies
 COPY --from=base --chown=${USER}:${USER} ${WORKSPACE}/packages ${WORKSPACE}/packages
 
-WORKDIR ${WORKSPACE}/${PROJECT}
+WORKDIR ${WORKSPACE}/apps/${PROJECT}
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["node", "./dist"]
