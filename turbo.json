@@ -4,8 +4,7 @@
     "build:watch": {
       "outputs": [
         "./dist/**"
-      ],
-      "persistent": true
+      ]
     },
     "build": {
       "outputs": [
