@@ -32,9 +32,9 @@ services:
       args: *client-args
     restart: unless-stopped
     volumes:
-      - ./apps/client:/app/apps/client:ro
-      - packages-math-ephemeral:/app/packages/math/dist:ro
-      - packages-logger-ephemeral:/app/packages/logger/dist:ro
+      - ./apps/client:/workspace/apps/client:ro
+      - packages-math-ephemeral:/workspace/packages/math/dist:ro
+      - packages-logger-ephemeral:/workspace/packages/logger/dist:ro
     depends_on:
       - math-dev
       - logger-dev
