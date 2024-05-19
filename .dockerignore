@@ -1,0 +1,10 @@
+/**/dist/
+/**/node_modules/
+/**/.turbo/
+/**/.env*
+/**/*docker*
+/**/scripts
+/**/.gitignore
+
+out/
+.git/
