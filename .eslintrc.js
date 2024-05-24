@@ -30,6 +30,11 @@ const tsRules = {
   ...rules,
   '@typescript-eslint/no-non-null-assertion': 0,
 };
+const reactRules = {
+  ...rules,
+  ...tsRules,
+  'react-refresh/only-export-components': 'warn',
+};
 
 /** @type {import('@typescript-eslint/utils').TSESLint.Linter.Config} */
 module.exports = {
@@ -49,6 +54,34 @@ module.exports = {
         'plugin:@typescript-eslint/recommended',
       ],
       rules: tsRules,
+    },
+    {
+      files: ['*.tsx'],
+      env: {
+        browser: true,
+      },
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      settings: {
+        react: {
+          version: 'detect',
+        },
+      },
+      plugins: ['@typescript-eslint/eslint-plugin', 'react', 'react-hooks', 'react-refresh'],
+      extends: [
+        '@forvais/eslint-config-base',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:react/recommended',
+        'plugin:react/jsx-runtime',
+        'plugin:react-hooks/recommended',
+      ],
+      rules: reactRules,
     },
     {
       files: ['*.js'],
