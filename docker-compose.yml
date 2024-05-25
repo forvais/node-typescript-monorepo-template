@@ -14,7 +14,7 @@ services:
 # ========================== PRODUCTION ==========================
   api-prod:
     build:
-      dockerfile: ./docker/Dockerfile-api
+      dockerfile: ./docker/Dockerfile-node
       target: production
       args: *api-args
 
@@ -22,7 +22,7 @@ services:
 # ========================== DEVELOPMENT ==========================
   api-dev:
     build:
-      dockerfile: ./docker/Dockerfile-api
+      dockerfile: ./docker/Dockerfile-node
       target: development
       args: *api-args
     restart: unless-stopped
