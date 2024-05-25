@@ -1,5 +1,5 @@
 {
-  "name": "@node-typescript-monorepo-template/client",
+  "name": "@node-typescript-monorepo-template/api",
   "type": "module",
   "private": true,
   "version": "0.0.0",
@@ -7,6 +7,9 @@
   "license": "MIT",
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.25",
     "tsc-alias": "^1.8.8",
     "tsx": "^4.7.1",
@@ -14,12 +17,17 @@
   },
   "scripts": {
     "build": "tsc && tsc-alias",
-    "start": "npm run dist/index.js",
+    "start": "node dist/index.js",
     "start:dev": "node --watch --import tsx/esm src/",
     "lint": "eslint --ext ts src/ && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@node-typescript-monorepo-template/logger": "^0.0.0",
-    "@node-typescript-monorepo-template/math": "^0.0.0"
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "zod": "^3.23.8",
+    "zod-validation-error": "^3.3.0"
   }
 }

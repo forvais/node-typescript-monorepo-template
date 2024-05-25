@@ -1,14 +1,9 @@
 # ========================== VARIABLES ==========================
-x-client-args: &client-args
+x-api-args: &api-args
   SCOPE: "@node-typescript-monorepo-template"
-  PROJECT: client
+  PROJECT: api
   DOCKER_NODE_VERSION: 20.11.1-slim
   DOCKER_UBUNTU_VERSION: jammy-20230624
-
-x-math-args: &math-args
-  SCOPE: "@node-typescript-monorepo-template"
-  PROJECT: math
-  DOCKER_NODE_VERSION: 20.11.1-slim
 
 x-logger-args: &logger-args
   SCOPE: "@node-typescript-monorepo-template"
@@ -17,37 +12,25 @@ x-logger-args: &logger-args
 
 services:
 # ========================== PRODUCTION ==========================
-  client-prod:
+  api-prod:
     build:
       dockerfile: ./docker/Dockerfile-api
       target: production
-      args: *client-args
+      args: *api-args
 
 
 # ========================== DEVELOPMENT ==========================
-  client-dev:
+  api-dev:
     build:
       dockerfile: ./docker/Dockerfile-api
       target: development
-      args: *client-args
+      args: *api-args
     restart: unless-stopped
     volumes:
-      - ./apps/client:/workspace/apps/client:ro
-      - packages-math-ephemeral:/workspace/packages/math/dist:ro
+      - ./apps/api:/workspace/apps/api:ro
       - packages-logger-ephemeral:/workspace/packages/logger/dist:ro
     depends_on:
-      - math-dev
       - logger-dev
-
-  math-dev:
-    build:
-      dockerfile: ./docker/Dockerfile-package
-      target: builder
-      args: *math-args
-    restart: unless-stopped
-    volumes:
-      - ./packages/math/:/app/lib:ro
-      - packages-math-ephemeral:/app/lib/dist:rw
 
   logger-dev:
     build:
@@ -60,5 +43,4 @@ services:
       - packages-logger-ephemeral:/app/lib/dist:rw
 
 volumes:
-  packages-math-ephemeral:
   packages-logger-ephemeral:
