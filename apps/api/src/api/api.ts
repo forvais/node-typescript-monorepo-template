@@ -7,6 +7,7 @@ import morgan from 'morgan';
 
 import { logger } from '@node-typescript-monorepo-template/logger';
 import { env } from '../env.js';
+import { sendResponse } from './utils.js';
 
 /* eslint-disable-next-line @typescript-eslint/ban-types */
 export type Resources = {};
@@ -42,17 +43,8 @@ export class Api {
       this.app.use(route.path, route.router);
     }
 
-    this.app.get('/healthz', async (_: Request, res: Response) => {
-      res.status(200).json({
-        data: 'OK!',
-      });
-    });
-
-    this.app.all('*', (req: Request, res: Response) => {
-      res.status(404).json({
-        data: `Route ${req.url} not found.`,
-      });
-    });
+    this.app.get('/healthz', sendResponse(200, 'OK!'));
+    this.app.all('*', (req: Request, res: Response) => sendResponse(404, `Route '${req.url}' not found.`)(req, res));
   }
 
   public start(host: string, port: number, cb?: () => void) {
