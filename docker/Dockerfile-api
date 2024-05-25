@@ -27,12 +27,11 @@ ARG PROJECT
 ARG WORKSPACE
 WORKDIR ${WORKSPACE}
 
-COPY --chown=${USER}:${USER} ./apps ./apps
-COPY --chown=${USER}:${USER} ./packages ./packages
 COPY --chown=${USER}:${USER} ./package*.json ./
-COPY --chown=${USER}:${USER} ./turbo.json ./turbo.json
-RUN npm install \
-    && npx --no-install turbo prune ${SCOPE}/${PROJECT} --docker \
+RUN npm install
+
+COPY --chown=${USER}:${USER} ./ ./
+RUN npx --no-install turbo prune ${SCOPE}/${PROJECT} --docker \
     && mv ./out/package-lock.json ./out/full/package-lock.json
 
 
@@ -80,7 +79,6 @@ RUN groupadd --gid 1000 ${USER} \
 USER ${USER}
 WORKDIR ${WORKSPACE}
 
-COPY --chown=${USER}:${USER} ./ ./
 COPY --from=turbo --chown=${USER}:${USER} ${WORKSPACE}/out/full ./
 COPY --from=dev-modules --chown=${USER}:${USER} ${WORKSPACE}/node_modules ./node_modules
 RUN npx --no-install turbo run build --filter="./packages/*"
