@@ -27,12 +27,13 @@ ARG PROJECT
 ARG WORKSPACE
 WORKDIR ${WORKSPACE}
 
+COPY --chown=${USER}:${USER} ./package*.json ./
+RUN npm install
+
 COPY --chown=${USER}:${USER} ./apps ./apps
 COPY --chown=${USER}:${USER} ./packages ./packages
-COPY --chown=${USER}:${USER} ./package*.json ./
 COPY --chown=${USER}:${USER} ./turbo.json ./turbo.json
-RUN npm install \
-    && npx --no-install turbo prune ${SCOPE}/${PROJECT} --docker \
+RUN npx --no-install turbo prune ${SCOPE}/${PROJECT} --docker \
     && mv ./out/package-lock.json ./out/full/package-lock.json
 
 
