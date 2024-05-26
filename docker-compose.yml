@@ -24,12 +24,18 @@ services:
       dockerfile: ./docker/Dockerfile-node
       target: production
       args: *api-args
+    env_file: .env
 
   frontend-prod:
     build:
       dockerfile: ./docker/Dockerfile-web
       target: production
       args: *frontend-args
+    env_file: .env
+    environment:
+      PROXY_API: http://api-prod:${API_PORT}
+    ports:
+      - ${WEB_PORT}:${WEB_PORT}
 
 
 # ========================== DEVELOPMENT ==========================
@@ -39,6 +45,7 @@ services:
       target: development
       args: *api-args
     restart: unless-stopped
+    env_file: .env
     volumes:
       - ./apps/api:/workspace/apps/api:ro
       - packages-logger-ephemeral:/workspace/packages/logger/dist:ro
@@ -51,8 +58,11 @@ services:
       target: development
       args: *frontend-args
     restart: unless-stopped
+    env_file: .env
     environment:
-      PROXY_API: http://api-dev:3000
+      PROXY_API: http://api-dev:${API_PORT}
+    ports:
+      - ${WEB_PORT}:${WEB_PORT}
     volumes:
       - ./apps/frontend:/workspace/apps/frontend
 
