@@ -1,0 +1,54 @@
+---
+name: Build compose service
+description: Build
+
+inputs:
+  service:
+    description: The name of the compose service to be built.
+    required: true
+
+  compose-file:
+    description: The file path to docker-compomse.yml.
+    default: docker-compose.yml
+
+runs:
+  using: composite
+  steps:
+      - uses: actions/checkout@v4
+
+      - name: Save a parsed copy of ${{ inputs.compose-file }}
+        shell: bash
+        run: docker compose -f ${{ inputs.compose-file }} config > docker-compose-parsed.yml
+
+      - name: Pull Dockerfile path from ${{ inputs.compose-file }}
+        id: dockerfile
+        uses: mikefarah/yq@v4.44.1
+        with:
+          cmd: yq '.services.${{ inputs.service }}.build.dockerfile' docker-compose-parsed.yml
+
+      - name: Pull Dockerfile build arguments from ${{ inputs.compose-file }}
+        id: build-args
+        uses: mikefarah/yq@v4.44.1
+        with:
+          cmd: "yq '.services.${{ inputs.service }}.build.args' docker-compose-parsed.yml | sed 's/: /=/g' | sed \"s/'//g\""
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build
+        uses: docker/build-push-action@v5.3.0
+        with:
+          context: .
+          file: ${{ steps.dockerfile.outputs.result }}
+          build-args: ${{ steps.build-args.outputs.result }}
+          target: production
+          tags: ${{ inputs.service }}:latest
+          outputs: type=docker,dest=/tmp/${{ inputs.service }}.tar
+          cache-from: type=gha, scope=${{ github.workflow }}
+          cache-to: type=gha, scope=${{ github.workflow }}
+
+      - name: Upload docker artifacts
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: ${{ inputs.service }}
+          path: /tmp/${{ inputs.service }}.tar
