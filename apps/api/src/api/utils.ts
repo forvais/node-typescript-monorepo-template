@@ -3,7 +3,6 @@ import express from 'express';
 import { ZodError } from 'zod';
 
 declare global {
-  /* eslint-disable-next-line @typescript-eslint/no-namespace */
   namespace Express {
     export interface Request {
       page: number;
