@@ -29,6 +29,7 @@ const jsRules = { ...rules };
 const tsRules = {
   ...rules,
   '@typescript-eslint/no-non-null-assertion': 0,
+  '@typescript-eslint/no-namespace': 0,
 };
 const reactRules = {
   ...rules,
