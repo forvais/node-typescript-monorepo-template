@@ -5,6 +5,13 @@ x-api-args: &api-args
   DOCKER_NODE_VERSION: 20.11.1-slim
   DOCKER_UBUNTU_VERSION: jammy-20230624
 
+x-frontend-args: &frontend-args
+  SCOPE: "@node-typescript-monorepo-template"
+  PROJECT: frontend
+  DOCKER_NODE_VERSION: 20.11.1-slim
+  DOCKER_UBUNTU_VERSION: jammy-20230624
+  DOCKER_NGINX_VERSION: 1.26.0
+
 x-logger-args: &logger-args
   SCOPE: "@node-typescript-monorepo-template"
   PROJECT: logger
@@ -14,23 +21,50 @@ services:
 # ========================== PRODUCTION ==========================
   api-prod:
     build:
-      dockerfile: ./docker/Dockerfile-api
+      dockerfile: ./docker/Dockerfile-node
       target: production
       args: *api-args
+    env_file: .env
+
+  frontend-prod:
+    build:
+      dockerfile: ./docker/Dockerfile-web
+      target: production
+      args: *frontend-args
+    env_file: .env
+    environment:
+      PROXY_API: http://api-prod:${API_PORT}
+    ports:
+      - ${WEB_PORT}:${WEB_PORT}
 
 
 # ========================== DEVELOPMENT ==========================
   api-dev:
     build:
-      dockerfile: ./docker/Dockerfile-api
+      dockerfile: ./docker/Dockerfile-node
       target: development
       args: *api-args
     restart: unless-stopped
+    env_file: .env
     volumes:
       - ./apps/api:/workspace/apps/api:ro
       - packages-logger-ephemeral:/workspace/packages/logger/dist:ro
     depends_on:
       - logger-dev
+
+  frontend-dev:
+    build:
+      dockerfile: ./docker/Dockerfile-web
+      target: development
+      args: *frontend-args
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PROXY_API: http://api-dev:${API_PORT}
+    ports:
+      - ${WEB_PORT}:${WEB_PORT}
+    volumes:
+      - ./apps/frontend:/workspace/apps/frontend
 
   logger-dev:
     build:

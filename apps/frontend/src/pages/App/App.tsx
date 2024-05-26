@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import './App.scss';
 
-const apiHealthEndpoint = (new URL('/healthz', import.meta.env.VITE_API)).toString();
+const apiHealthEndpoint = '/api/healthz';
 
 function App() {
   const healthQuery = useQuery({
