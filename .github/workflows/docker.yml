@@ -1,0 +1,103 @@
+---
+name: Docker
+
+on:
+  push: # Canary builds
+    branches: [ main ]
+  release: # Production builds
+    types: [ published ]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    name: Build ${{ matrix.project }} image
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        project: [api, frontend]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        uses: ./.github/actions/build-compose-service
+        with:
+          service: ${{ matrix.project }}-prod
+
+  push:
+    needs:
+      - build
+
+    permissions:
+      contents: read
+      packages: write
+
+    name: Upload ${{ matrix.project }} image
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        project: [api, frontend]
+
+    steps:
+      - name: Download docker artifacts
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: ${{ matrix.project }}-prod
+          path: /tmp
+
+      - name: Set image tag
+        run: |
+          tag=$(echo ${{ github.event.release.tag_name || 'release-latest' }} | cut -d- -f2)
+          echo "$tag"
+          echo "TAG=$tag" >> $GITHUB_ENV
+
+      - name: Set final image name
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          echo "IMAGE=${{ env.REGISTRY }}/${REPO,,}-${{ matrix.project }}" >> $GITHUB_ENV
+
+      - name: Load docker image
+        run: |
+          docker load --input /tmp/${{ matrix.project }}-prod.tar
+          docker tag ${{ matrix.project }}-prod ${{ env.IMAGE }}
+          docker image ls -a
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push latest image to ghcr.io
+        run: |
+          docker push ${{ env.IMAGE }}:latest
+
+      - name: Push versioned image to ghcr.io
+        if: env.TAG != 'latest'
+        run: |
+          docker tag ${{ env.IMAGE }}:latest ${{ env.IMAGE }}:${{ env.TAG }}
+          docker push ${{ env.IMAGE }}:${{ env.TAG }}
+
+  cleanup:
+    needs:
+      - build
+      - push
+
+    name: Clean ${{ matrix.project }} artifact
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        project: [api, frontend]
+
+    steps:
+      - name: Remove artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: ${{ matrix.project }}-prod
