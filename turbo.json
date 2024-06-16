@@ -13,9 +13,6 @@
     },
     "lint": {},
     "start:dev": {
-      "dependsOn": [
-        "build:watch"
-      ],
       "cache": false,
       "persistent": true
     },
