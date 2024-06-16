@@ -1,20 +1,19 @@
 {
   "name": "@node-typescript-monorepo-template/logger",
   "private": true,
+  "type": "module",
   "version": "0.0.0",
   "author": "Ben Chiang <chiangbenjamin991@gmail.com>",
   "license": "MIT",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.11.25",
-    "tsc-alias": "^1.8.8",
     "typescript": "^5.4.2"
   },
   "scripts": {
-    "build:watch": "tsc --watch & tsc-alias --watch",
-    "build": "tsc && tsc-alias",
     "lint": "eslint --ext ts src && tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
