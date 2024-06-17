@@ -51,7 +51,7 @@ ARG WORKSPACE
 WORKDIR ${WORKSPACE}
 COPY --from=turbo --chown=${USER}:${USER} ${WORKSPACE}/out/json ./
 
-RUN npm install --omit=dev
+RUN npm install --omit=dev tsx@4.7.1
 
 
 # ========================== BASE STAGE ==========================
@@ -94,12 +94,6 @@ ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["npm", "run", "start:dev"]
 
 
-# ========================== BUILD STAGE ==========================
-FROM base AS build
-
-RUN npx --no-install turbo run build --filter='./apps/*'
-
-
 # ========================== PRODUCTION STAGE ==========================
 FROM scratch AS production
 ARG PROJECT
@@ -116,16 +110,15 @@ COPY --from=node /node-deps/ /
 COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /lib64/ld-linux-x86-64.so.2 /lib64/
 
-# Copy build artifacts
-COPY --from=base --chown=${USER}:${USER} ${WORKSPACE}/apps/${PROJECT} ${WORKSPACE}/apps/${PROJECT}
-COPY --from=build --chown=${USER}:${USER} ${WORKSPACE}/apps/${PROJECT}/dist ${WORKSPACE}/apps/${PROJECT}/dist
+# Copy source files
+COPY --from=base --chown=${USER}:${USER} ${WORKSPACE}/apps/${PROJECT}/src ${WORKSPACE}/apps/${PROJECT}/src
 
 # Copy production dependencies
 COPY --from=prod-modules --chown=${USER}:${USER} ${WORKSPACE}/node_modules ${WORKSPACE}/node_modules
 
-# Copy production dependencies
+# Copy internal packages
 COPY --from=base --chown=${USER}:${USER} ${WORKSPACE}/packages ${WORKSPACE}/packages
 
 WORKDIR ${WORKSPACE}/apps/${PROJECT}
 ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["node", "./dist"]
+CMD ["node", "--import", "tsx", "src/"]
