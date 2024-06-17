@@ -12,11 +12,6 @@ x-frontend-args: &frontend-args
   DOCKER_UBUNTU_VERSION: jammy-20230624
   DOCKER_NGINX_VERSION: 1.26.0
 
-x-logger-args: &logger-args
-  SCOPE: "@node-typescript-monorepo-template"
-  PROJECT: logger
-  DOCKER_NODE_VERSION: 20.11.1-slim
-
 services:
 # ========================== PRODUCTION ==========================
   api-prod:
@@ -48,9 +43,7 @@ services:
     env_file: .env
     volumes:
       - ./apps/api:/workspace/apps/api:ro
-      - packages-logger-ephemeral:/workspace/packages/logger/dist:ro
-    depends_on:
-      - logger-dev
+      - ./packages:/workspace/packages:ro
 
   frontend-dev:
     build:
@@ -65,16 +58,3 @@ services:
       - ${WEB_PORT}:${WEB_PORT}
     volumes:
       - ./apps/frontend:/workspace/apps/frontend
-
-  logger-dev:
-    build:
-      dockerfile: ./docker/Dockerfile-package
-      target: builder
-      args: *logger-args
-    restart: unless-stopped
-    volumes:
-      - ./packages/logger/:/app/lib:ro
-      - packages-logger-ephemeral:/app/lib/dist:rw
-
-volumes:
-  packages-logger-ephemeral:

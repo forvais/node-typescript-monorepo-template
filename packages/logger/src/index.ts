@@ -4,7 +4,7 @@ import fs from 'fs';
 import type Transport from 'winston-transport';
 import winston from 'winston';
 
-import { ConsoleTransporter, ErrorFileTransporter, LogFileTransporter } from './transporters';
+import { ConsoleTransporter, ErrorFileTransporter, LogFileTransporter } from './transporters.js';
 
 declare namespace Logger {
   type Options = Partial<{
