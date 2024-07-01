@@ -134,7 +134,7 @@ export function use<T extends ResponseData>(handler: Handler<T> | HandlerPromise
       if (err instanceof Error) logger.error(err.stack);
 
       if (err instanceof ApiError) {
-        sendResponse(500, err)(req, res);
+        sendResponse(err.httpStatus, err)(req, res);
         return;
       }
 
