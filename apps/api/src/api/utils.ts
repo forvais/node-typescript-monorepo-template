@@ -1,6 +1,8 @@
 import { logger } from '@node-typescript-monorepo-template/logger';
 import express from 'express';
 import { ZodError } from 'zod';
+import { ApiError } from './errors/ApiError.js';
+import { env } from '../env.js';
 
 declare global {
   namespace Express {
@@ -131,7 +133,12 @@ export function use<T extends ResponseData>(handler: Handler<T> | HandlerPromise
     } catch (err) {
       if (err instanceof Error) logger.error(err.stack);
 
-      sendResponse(500, err as Error)(req, res);
+      if (err instanceof ApiError) {
+        sendResponse(500, err)(req, res);
+        return;
+      }
+
+      sendResponse(500, new Error('Internal Server Error'))(req, res);
     }
   };
 }
