@@ -28,9 +28,9 @@
   },
   "packageManager": "npm@10.5.0",
   "scripts": {
-    "start": "dotenv -- turbo start",
-    "start:dev": "dotenv -- turbo start:dev",
-    "build": "dotenv -- turbo build",
+    "start": "cross-env NODE_ENV=production dotenv -- turbo start",
+    "start:dev": "cross-env NODE_ENV=development dotenv -- turbo start:dev",
+    "build": "cross-env NODE_ENV=production dotenv -- turbo build",
     "lint": "dotenv -- turbo lint"
   }
 }
