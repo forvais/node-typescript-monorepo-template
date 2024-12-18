@@ -2,7 +2,6 @@ import { logger } from '@node-typescript-monorepo-template/logger';
 import express from 'express';
 import { ZodError } from 'zod';
 import { ApiError } from './errors/ApiError.js';
-import { env } from '../env.js';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
