@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import App from './pages/App/App.tsx';
 import './index.scss';
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const container = document.getElementById('root')!;
 const root = ReactDOM.createRoot(container);
 

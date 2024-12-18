@@ -1,5 +1,3 @@
-import { logger } from '@node-typescript-monorepo-template/logger';
-
 import { Api, Resources, Route } from './api/api.js';
 import { createRoutes } from './api/v1/index.js';
 

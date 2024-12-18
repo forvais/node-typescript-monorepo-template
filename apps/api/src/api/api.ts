@@ -9,8 +9,7 @@ import { logger } from '@node-typescript-monorepo-template/logger';
 import { env } from '../env.js';
 import { sendResponse } from './utils.js';
 
-/* eslint-disable-next-line @typescript-eslint/ban-types */
-export type Resources = {};
+export type Resources = object;
 
 export type Route = {
   path: string,
@@ -25,6 +24,7 @@ export class Api {
 
   private readonly services: Record<string, URL> = {};
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor(routes: Route[], resources: Resources) {
     this.app = express();
 
