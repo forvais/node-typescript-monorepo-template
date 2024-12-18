@@ -82,34 +82,26 @@ export function sendResponse<T extends ResponseData>(status: number, data: T) {
       responseBody.err = err;
     }
 
-    if (!Array.isArray(data)) {
+    if (Array.isArray(data)) {
+      const { page = DEFAULT_PAGE, limit = DEFAULT_LIMIT } = req;
+      const subsetFrom = page * limit;
+      const subsetTo = Math.min(data.length, subsetFrom + limit);
+
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+      const _createPaginationLink = createPaginationLink.bind(null, fullUrl, data.length);
+      const prev = _createPaginationLink(page - 1, limit);
+      const next = _createPaginationLink(page + 1, limit);
+
+      responseBody.data = arraySubset(data, subsetFrom, subsetTo);
+      responseBody.pagination = { next, prev };
+    } else {
       responseBody.data = data;
 
       // NOTE: Want to remove paginations on non-array responses?
       // delete responseBody.pagination;
-
-      return res.status(status).json(responseBody);
     }
 
-    // NOTE: Only non-error arrays past this point
-
-    const { page = DEFAULT_PAGE, limit = DEFAULT_LIMIT } = req;
-    const subsetFrom = page * limit;
-    const subsetTo = Math.min(data.length, subsetFrom + limit);
-
-    const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-    const _createPaginationLink = createPaginationLink.bind(null, fullUrl, data.length);
-    const prev = _createPaginationLink(page - 1, limit);
-    const next = _createPaginationLink(page + 1, limit);
-
-    responseBody.data = arraySubset(data, subsetFrom, subsetTo);
-
-    if (responseBody.pagination) {
-      responseBody.pagination.next = next;
-      responseBody.pagination.prev = prev;
-    }
-
-    return res.status(status).json(responseBody);
+    res.status(status).json(responseBody);
   };
 }
 
