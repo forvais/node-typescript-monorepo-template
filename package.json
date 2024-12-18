@@ -10,7 +10,7 @@
     "packages/logger"
   ],
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "devDependencies": {
     "@forvais/eslint-config-base": "^2.0.0",
