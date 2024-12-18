@@ -9,15 +9,15 @@
     ".": "./src/index.ts"
   },
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.2",
-    "@types/node": "^20.11.25",
-    "typescript": "^5.4.2"
+    "@tsconfig/node20": "^20.1.4",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
   },
   "scripts": {
     "lint": "eslint src && tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
-    "winston": "^3.13.0",
+    "winston": "^3.17.0",
     "winston-transport": "^4.9.0"
   }
 }
