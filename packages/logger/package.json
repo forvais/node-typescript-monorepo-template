@@ -14,7 +14,7 @@
     "typescript": "^5.4.2"
   },
   "scripts": {
-    "lint": "eslint --ext ts src && tsc --noEmit --project tsconfig.json"
+    "lint": "eslint src && tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
     "winston": "^3.13.0"
