@@ -17,7 +17,7 @@
   "scripts": {
     "start": "node --import tsx/esm src/",
     "start:dev": "node --watch --import tsx/esm src/",
-    "lint": "eslint --ext ts src/ && tsc --noEmit -p tsconfig.json"
+    "lint": "eslint src/ && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@node-typescript-monorepo-template/logger": "^0.0.0",

@@ -1,5 +1,5 @@
 import z from 'zod';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 
 import { Resources } from '../../api.js';
 

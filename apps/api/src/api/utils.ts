@@ -5,7 +5,8 @@ import { ApiError } from './errors/ApiError.js';
 import { env } from '../env.js';
 
 declare global {
-  namespace Express {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  export namespace Express {
     export interface Request {
       page: number;
       limit: number;
@@ -103,8 +104,11 @@ export function sendResponse<T extends ResponseData>(status: number, data: T) {
     const next = _createPaginationLink(page + 1, limit);
 
     responseBody.data = arraySubset(data, subsetFrom, subsetTo);
-    responseBody.pagination!.next = next;
-    responseBody.pagination!.prev = prev;
+
+    if (responseBody.pagination) {
+      responseBody.pagination.next = next;
+      responseBody.pagination.prev = prev;
+    }
 
     return res.status(status).json(responseBody);
   };

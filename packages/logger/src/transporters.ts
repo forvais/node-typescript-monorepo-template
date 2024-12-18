@@ -26,6 +26,6 @@ const errorFileFormat = format.combine(
   fileFormat,
 );
 
-export const ConsoleTransporter = () => new winston.transports.Console({ format: consoleFormat, level: 'info' });
-export const LogFileTransporter = (filename: string) => new winston.transports.File({ format: fileFormat, filename, level: 'info' });
-export const ErrorFileTransporter = (filename: string) => new winston.transports.File({ format: errorFileFormat, filename, level: 'error' });
+export const consoleTransporter = () => new winston.transports.Console({ format: consoleFormat, level: 'info' });
+export const logFileTransporter = (filename: string) => new winston.transports.File({ format: fileFormat, filename, level: 'info' });
+export const errorFileTransporter = (filename: string) => new winston.transports.File({ format: errorFileFormat, filename, level: 'error' });

@@ -4,8 +4,9 @@ import fs from 'fs';
 import type Transport from 'winston-transport';
 import winston from 'winston';
 
-import { ConsoleTransporter, ErrorFileTransporter, LogFileTransporter } from './transporters.js';
+import { consoleTransporter, errorFileTransporter, logFileTransporter } from './transporters.js';
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace Logger {
   type Options = Partial<{
     path: string
@@ -14,7 +15,7 @@ declare namespace Logger {
 
 export const configureLogger = (opts: Logger.Options = {}) => {
   const transporters: Transport[] = [
-    ConsoleTransporter(),
+    consoleTransporter(),
   ];
 
   if (opts.path && opts.path.length > 0) {
@@ -36,9 +37,9 @@ export const configureLogger = (opts: Logger.Options = {}) => {
         fs.writeFileSync(errorLogFilepath, '');
       }
 
-      transporters.push(LogFileTransporter(logFilepath));
-      transporters.push(ErrorFileTransporter(errorLogFilepath));
-    } catch (e) {
+      transporters.push(logFileTransporter(logFilepath));
+      transporters.push(errorFileTransporter(errorLogFilepath));
+    } catch {
       // Likely to throw on system that do not allow writing files
     }
   }

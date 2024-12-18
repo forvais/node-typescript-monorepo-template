@@ -1,4 +1,3 @@
-import * as zErr from 'zod-validation-error';
 import z from 'zod';
 
 const NODE_ENV = ['production', 'development'] as const;
