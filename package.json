@@ -18,15 +18,15 @@
     "@forvais/eslint-config-typescript": "^1.0.0",
     "@tanstack/eslint-plugin-query": "^5.74.7",
     "cross-env": "^7.0.3",
-    "dotenv-cli": "^7.4.4",
+    "dotenv-cli": "^8.0.0",
     "eslint": "^9.27.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.1.0",
-    "turbo": "^2.3.3"
+    "turbo": "^2.5.3"
   },
-  "packageManager": "npm@11.0.0",
+  "packageManager": "npm@11.4.0",
   "scripts": {
     "start": "cross-env NODE_ENV=production dotenv -- turbo start",
     "start:dev": "cross-env NODE_ENV=development dotenv -- turbo start:dev",
