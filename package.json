@@ -31,7 +31,17 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production dotenv -- turbo start",
     "start:dev": "cross-env NODE_ENV=development dotenv -- turbo start:dev",
-    "build": "cross-env NODE_ENV=production dotenv -- turbo build",
-    "lint": "dotenv -- turbo lint"
+    "build": "cross-env NODE_ENV=production dotenv -- turbo run build --ui=stream",
+    "lint": "dotenv -- turbo run lint --ui=stream",
+    "docker:start": "node ./scripts/docker.js docker:start",
+    "docker:start:dev": "node ./scripts/docker.js docker:start:dev",
+    "docker:stop": "node ./scripts/docker.js docker:stop",
+    "docker:stop:dev": "node ./scripts/docker.js docker:stop:dev",
+    "docker:build": "node ./scripts/docker.js docker:build",
+    "docker:build:dev": "node ./scripts/docker.js docker:build:dev",
+    "docker:start:services": "node ./scripts/docker.js docker:start:services",
+    "docker:stop:services": "node ./scripts/docker.js docker:stop:services",
+    "docker:stop:all": "node ./scripts/docker.js docker:stop:all",
+    "docker:logs": "node ./scripts/docker.js docker:logs"
   }
 }
