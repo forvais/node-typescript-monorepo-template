@@ -2,13 +2,13 @@
 x-api-args: &api-args
   SCOPE: "@node-typescript-monorepo-template"
   PROJECT: api
-  DOCKER_NODE_VERSION: 20.11.1-slim
+  DOCKER_NODE_VERSION: 20.11.1
   DOCKER_UBUNTU_VERSION: jammy-20230624
 
 x-frontend-args: &frontend-args
   SCOPE: "@node-typescript-monorepo-template"
   PROJECT: frontend
-  DOCKER_NODE_VERSION: 20.11.1-slim
+  DOCKER_NODE_VERSION: 20.11.1
   DOCKER_UBUNTU_VERSION: jammy-20230624
   DOCKER_NGINX_VERSION: 1.26.0
 
