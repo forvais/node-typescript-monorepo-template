@@ -87,6 +87,8 @@ COPY --from=turbo --chown=${USER}:${USER} ${WORKSPACE}/out/full ./
 FROM base AS development
 ENV NODE_ENV=development
 
+COPY --from=dev-modules --chown=${USER}:${USER} ${WORKSPACE}/node_modules ./node_modules
+
 WORKDIR ${WORKSPACE}/apps/${PROJECT}
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
