@@ -8,7 +8,8 @@
     "apps/api",
     "apps/frontend",
     "packages/logger",
-    "packages/env"
+    "packages/env",
+    "packages/utils"
   ],
   "engines": {
     "node": ">=22.0.0"
