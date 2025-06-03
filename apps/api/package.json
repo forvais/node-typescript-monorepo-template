@@ -6,11 +6,11 @@
   "author": "Ben Chiang <chiangbenjamin991@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@tsconfig/node20": "^20.1.4",
+    "@tsconfig/node24": "^24.0.1",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.15.29",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
