@@ -20,6 +20,7 @@
     "lint": "eslint src/ && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@node-typescript-monorepo-template/env": "^0.0.0",
     "@node-typescript-monorepo-template/logger": "^0.0.0",
     "cors": "^2.8.5",
     "express": "^4.21.2",

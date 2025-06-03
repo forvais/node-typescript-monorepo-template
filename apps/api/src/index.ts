@@ -1,10 +1,7 @@
+import env from '@node-typescript-monorepo-template/env';
+
 import { Api, Resources, Route } from './api/api.js';
 import { createRoutes } from './api/v1/index.js';
-
-import { env } from './env.js';
-
-const HOST = env.API_HOST;
-const PORT = env.API_PORT;
 
 const resources: Resources = {};
 const routes: Route[] = [
@@ -15,4 +12,4 @@ const routes: Route[] = [
 ];
 
 const api = new Api(routes, resources);
-api.start(HOST, PORT);
+api.start(env.API_HOST, env.API_PORT);
