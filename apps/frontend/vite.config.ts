@@ -12,6 +12,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     envDir,
+    preview: {
+      port: PORT,
+    },
     server: {
       port: PORT,
       proxy: {
