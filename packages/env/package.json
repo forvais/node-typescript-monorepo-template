@@ -1,0 +1,22 @@
+{
+  "name": "@node-typescript-monorepo-template/env",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "author": "Ben Chiang <chiangbenjamin991@gmail.com>",
+  "license": "MIT",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@tsconfig/node20": "^20.1.4",
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "scripts": {
+    "lint": "eslint src && tsc --noEmit --project tsconfig.json"
+  },
+  "dependencies": {
+    "zod": "^3.25.48"
+  }
+}
