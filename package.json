@@ -5,11 +5,8 @@
   "author": "Ben Chiang <chiangbenjamin991@gmail.com>",
   "license": "MIT",
   "workspaces": [
-    "apps/api",
-    "apps/frontend",
-    "packages/logger",
-    "packages/env",
-    "packages/utils"
+    "apps/*",
+    "packages/*"
   ],
   "engines": {
     "node": ">=22.0.0"
