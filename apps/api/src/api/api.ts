@@ -5,8 +5,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
 
+import env from '@node-typescript-monorepo-template/env';
 import { logger } from '@node-typescript-monorepo-template/logger';
-import { env } from '../env.js';
 import { sendResponse } from './utils.js';
 
 export type Resources = object;
@@ -15,8 +15,6 @@ export type Route = {
   path: string,
   router: express.Router
 }
-
-const IS_DEV = env.NODE_ENV !== 'production';
 
 export class Api {
   public readonly app: express.Application;
@@ -30,7 +28,7 @@ export class Api {
 
     this.app.use(helmet());
     this.app.use(cors());
-    this.app.use(morgan(IS_DEV ? 'dev' : 'combined', {
+    this.app.use(morgan(env.IS_DEV ? 'dev' : 'combined', {
       stream: {
         write: (msg: string) => logger.info(msg.trim()),
       },
